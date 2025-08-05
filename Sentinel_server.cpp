@@ -31,7 +31,7 @@ int main(){
     }
 
     //2. Create a socket 
-    SOCKET listenSocket = socket(AF_INET , SOCK_STREAM , 6);
+    SOCKET listenSocket = socket(AF_INET , SOCK_STREAM , 0);
     if(listenSocket == INVALID_SOCKET){
         cerr << "[!] Socket Creatation Faild: " << WSAGetLastError() <<"\n";
         WSACleanup();

