@@ -163,3 +163,13 @@ This C2 framework is strictly for:
 Do **not** deploy this on systems you do not own or have explicit permission to test.
 
 ---
+| Phase | Feature                                   | Code File                                    | Description                                   |
+| ----- | ----------------------------------------- | -------------------------------------------- | --------------------------------------------- |
+| ✅ 1   | Reverse shell (basic C2 channel)          | `Sentinel_agent.cpp` + `Sentinel_server.cpp` | You’ve already done this                      |
+| 🔜 2  | Add persistence                           | `Sentinel_agent.cpp`                         | Registry run key, Task Scheduler              |
+| 🔜 3  | Encrypt communication                     | Both                                         | XOR / AES over socket                         |
+| 🔜 4  | Modular command system (plugins/commands) | Agent + Server                               | Structured command handling                   |
+| 🔜 5  | File upload/download                      | Agent                                        | Exfiltration support                          |
+| 🔜 6  | Screenshot / webcam capture               | Agent (Windows API)                          | Real capabilities                             |
+| 🔜 7  | AV Evasion techniques                     | Agent                                        | Obfuscation, API unhooking, string encryption |
+| 🔜 8  | GUI or CLI C2 Client                      | Optional                                     | Better usability for operator                 |
