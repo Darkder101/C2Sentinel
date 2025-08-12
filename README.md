@@ -165,7 +165,7 @@ Do **not** deploy this on systems you do not own or have explicit permission to 
 ---
 | Phase | Feature                                   | Code File                                    | Description                                   |
 | ----- | ----------------------------------------- | -------------------------------------------- | --------------------------------------------- |
-| ✅ 1   | Reverse shell (basic C2 channel)          | `Sentinel_agent.cpp` + `Sentinel_server.cpp` | You’ve already done this                      |
+| ✅ 1   | Reverse shell (basic C2 channel)          | `Sentinel_agent.cpp` + `Sentinel_server.cpp` | already done this                      |
 | ✅ 2  | Add persistence                           | `Sentinel_agent.cpp`                         | Registry run key, Task Scheduler              |
 | 🔜 3  | Encrypt communication                     | Both                                         | XOR / AES over socket                         |
 | 🔜 4  | Modular command system (plugins/commands) | Agent + Server                               | Structured command handling                   |
