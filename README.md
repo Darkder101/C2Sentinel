@@ -1,175 +1,65 @@
-# 🎯 Custom C2 Framework (C++, Educational & Legal)
+# C2Sentinel
 
-> **DISCLAIMER**: This project is for **educational purposes only**. Do **not** use it outside of isolated, legal lab environments you own or control. Any misuse is **strictly prohibited**.
-
----
-
-## ✅ Development Roadmap (Stage-wise)
-
-This project builds a minimal yet extensible Command & Control (C2) framework in **C++**, following red-team practices and staying within legal boundaries. We develop one phase at a time — clean, modular, and educational.
+**C2Sentinel** is a minimal Command and Control (C2) framework built for **educational and research purposes only**.  
+It demonstrates the core communication model between a C2 server and an agent, using Winsock for TCP connections.
 
 ---
 
-## 🔹 Phase 1: Reverse Shell Core (MVP)
-
-### 🎯 Goal:
-Establish a working reverse TCP connection with basic command execution.
-
-### 🖥️ Agent:
-
-- Connects back to C2 server (reverse TCP)
-- Receives commands (e.g., `whoami`, `dir`, `ipconfig`)
-- Executes them and sends output back
-
-### 📡 Server:
-
-- Listens for incoming agent connection
-- Sends commands and receives results
-
-### 💻 C++ Focus:
-
-- WinSock (network sockets)
-- `CreateProcess`, `ReadFile`, `WriteFile` for command execution
-
-### ✅ Deliverable:
-
-- A functioning reverse shell (PoC)
-- The beginning of a custom C2 channel
+## 📜 Features
+- Basic C2 server-client communication
+- Agent persistence via Windows Registry
+- Configurable IP and Port via config files (`server_config.txt` / `agent_config.txt`)
 
 ---
 
-## 🔹 Phase 2: Modular Command System
+## 📂 Project Structure
+- Sentinel_server.cpp # C2 server source
+- Sentinel_agent.cpp # C2 agent source
+- server_config.txt # Server IP/Port config
+- agent_config.txt # Agent IP/Port config
 
-### 🎯 Goal:
-Create a scalable architecture for handling commands.
+---
+## ⚙️ Config File Format
+Both config files follow this format:
+- IP=127.0.0.1
+- PORT=4444
 
-### 🧩 Features:
-
-- Support command formats like:
-  - `exec:<cmd>`
-  - `screenshot`
-  - `keylog:on`
-- Dispatch commands to modular handlers
-
-### 💻 C++ Focus:
-
-- Enums or strings for command parsing
-- Handler functions (or class-based design)
-
-### ✅ Result:
-
-- Easily add new capabilities (keylogger, file ops, etc.)
+- **Server** reads from `server_config.txt`
+- **Agent** reads from `agent_config.txt`
 
 ---
 
-## 🔹 Phase 3: Encrypted Communication
+## 🚀 How to Build & Run
 
-### 🎯 Goal:
-Secure traffic with symmetric encryption.
+1. Compile both `Sentinel_server.cpp` and `Sentinel_agent.cpp` with a C++ compiler supporting Winsock2 (e.g., MSVC).
+2. Place `server_config.txt` in the same directory as the server executable.
+3. Place `agent_config.txt` in the same directory as the agent executable.
+4. Run the server first, then run the agent.
 
-### 🔐 Agent & Server:
-
-- Use **AES-128** or **AES-256**
-- Pre-shared symmetric key
-
-### 💻 C++ Focus:
-
-- OpenSSL or Windows CryptoAPI
-- Encrypt/decrypt all messages
-
-### ✅ Result:
-
-- Encrypted command and response channel
-- Reduced detection risk
+> 🔐 Ensure your environment is isolated and used strictly for learning or research.
 
 ---
 
-## 🔹 Phase 4: Additional Command Capabilities
+## ⚠️ Disclaimer & Author Liability
 
-### 🛠️ Add Commands:
+### ❗ The author of this project is **NOT responsible** for:
+- Any illegal or unauthorized use of this software
+- Damage caused to systems, networks, or data
+- Violations of laws, regulations, or policies resulting from misuse
 
-- `upload <file>`
-- `download <file>`
-- `screenshot` (GDI+ or Win32 API)
-- `keylogger start/stop`
-- `exit` or `self-delete`
+This tool was created **exclusively for learning and academic discussion** about C2 infrastructure design and detection.
 
-### 💻 C++ Focus:
+By downloading, using, or distributing this software, you agree that:
+- You will **not use it for unauthorized penetration testing, hacking, or attacks**
+- You assume **full responsibility** for any consequences of its use
+- You comply with all applicable local, national, and international laws
 
-- Implement features one-by-one
-- Modular design for rapid feature growth
-
----
-
-## 🔹 Phase 5: Persistence
-
-### 🎯 Goal:
-Allow agent to survive reboot (for lab testing).
-
-### 🔁 Techniques:
-
-- **Registry**: Add `Run` key
-- **Scheduled Tasks**: via `schtasks.exe` or COM
-- **(Optional)**: WMI Event Subscriptions
-
-### 💻 C++ Focus:
-
-- Windows Registry APIs
-- Scheduled task creation via shell or COM
-
-### ✅ Note:
-
-- Only run persistence in **your VM labs**!
+The author **disclaims all liability** and **will not be held accountable** under any circumstances for misuse of this code.
 
 ---
 
-## 🔹 Phase 6: Evasion Techniques
+## 🛑 Why Development Stopped
 
-### 🎯 Goal:
-Reduce AV/EDR detection in a controlled lab environment.
+While developing additional features (encryption, file transfer, etc.), it became clear that even in an educational context, the potential for misuse is significant.  
+To prevent any possible harm or legal risk, the project is now archived and **no further development will be made**.
 
-### 🕵 Techniques:
-
-- Dynamic API resolution (`LoadLibrary`, `GetProcAddress`)
-- String obfuscation (e.g., XOR encoding)
-- Compile as **shellcode** (optional)
-- Pack using **UPX** or custom loader
-
----
-
-## 🔹 Phase 7: C2 Server Enhancements
-
-### 🎯 Goal:
-Make server usable for realistic red teaming.
-
-### 📋 Features:
-
-- Log command sessions
-- Support multiple agents
-  - (via `select()` or threads)
-- Agent identification system
-- Interactive CLI interface
-
----
-
-## ⚖️ Legal & Ethical Use
-
-This C2 framework is strictly for:
-
-- Educational cybersecurity labs
-- Malware analysis training
-- Red team practice in controlled environments
-
-Do **not** deploy this on systems you do not own or have explicit permission to test.
-
----
-| Phase | Feature                                   | Code File                                    | Description                                   |
-| ----- | ----------------------------------------- | -------------------------------------------- | --------------------------------------------- |
-| ✅ 1   | Reverse shell (basic C2 channel)          | `Sentinel_agent.cpp` + `Sentinel_server.cpp` | already done this                      |
-| ✅ 2  | Add persistence                           | `Sentinel_agent.cpp`                         | Registry run key, Task Scheduler              |
-| 🔜 3  | Encrypt communication                     | Both                                         | XOR / AES over socket                         |
-| 🔜 4  | Modular command system (plugins/commands) | Agent + Server                               | Structured command handling                   |
-| 🔜 5  | File upload/download                      | Agent                                        | Exfiltration support                          |
-| 🔜 6  | Screenshot / webcam capture               | Agent (Windows API)                          | Real capabilities                             |
-| 🔜 7  | AV Evasion techniques                     | Agent                                        | Obfuscation, API unhooking, string encryption |
-| 🔜 8  | GUI or CLI C2 Client                      | Optional                                     | Better usability for operator                 |
